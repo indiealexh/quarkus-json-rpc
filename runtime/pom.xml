@@ -23,6 +23,10 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-jackson</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.asyncapi</groupId>
+            <artifactId>asyncapi-core</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

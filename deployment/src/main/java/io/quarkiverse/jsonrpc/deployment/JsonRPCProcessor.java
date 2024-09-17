@@ -19,11 +19,12 @@ import org.jboss.jandex.IndexView;
 import org.jboss.jandex.JandexReflection;
 import org.jboss.jandex.MethodInfo;
 import org.jboss.jandex.Type;
+import org.jboss.logging.Logger;
 
-import io.quarkiverse.jsonrpc.deployment.config.JsonRPCConfig;
 import io.quarkiverse.jsonrpc.runtime.JsonRPCRecorder;
 import io.quarkiverse.jsonrpc.runtime.JsonRPCRouter;
 import io.quarkiverse.jsonrpc.runtime.Keys;
+import io.quarkiverse.jsonrpc.runtime.config.JsonRPCConfig;
 import io.quarkiverse.jsonrpc.runtime.model.JsonRPCMethod;
 import io.quarkiverse.jsonrpc.runtime.model.JsonRPCMethodName;
 import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
@@ -46,11 +47,13 @@ import io.smallrye.common.annotation.NonBlocking;
 import io.smallrye.mutiny.Multi;
 
 public class JsonRPCProcessor {
-    private static final DotName JSON_RPC_API = DotName.createSimple("io.quarkiverse.jsonrpc.runtime.api.JsonRPCApi");
+    public static final DotName JSON_RPC_API = DotName.createSimple("io.quarkiverse.jsonrpc.runtime.api.JsonRPCApi");
     private static final String FEATURE = "json-rpc";
     private static final String CONSTRUCTOR = "<init>";
 
     private final ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+
+    private static final Logger LOGGER = Logger.getLogger(JsonRPCProcessor.class);
 
     @BuildStep
     FeatureBuildItem feature() {
@@ -262,5 +265,51 @@ public class JsonRPCProcessor {
             }
         }
     }
+
+    /*
+     * TODO: Example to clean up (From AsyncAPI Scanner)
+     *
+     * @Record(RUNTIME_INIT)
+     *
+     * @BuildStep(onlyIf = IsEnabled.class)
+     * void scanAsyncAPIs(
+     * CombinedIndexBuildItem aIndex,
+     * AsyncApiRecorder aRecorder,
+     * AsyncApiRuntimeConfig aConfig,
+     * RecorderContext aRecorderContext) {
+     * aRecorderContext.registerSubstitution(BigDecimal.class, Double.class, BigDecimalSubstitution.class);
+     * AsyncApiConfigResolver configResolver = new AsyncApiConfigResolver(aConfig);
+     * AsyncApiAnnotationScanner scanner = new AsyncApiAnnotationScanner(aIndex.getIndex(), configResolver);
+     * AsyncAPI.AsyncAPIBuilder builder = AsyncAPI.builder()
+     * .asyncapi(aConfig.version())
+     * .id(configResolver.getConfiguredKafkaBootstrapServer())
+     * .info(configResolver.getInfo())
+     * .defaultContentType(aConfig.defaultContentType());
+     * builder = scanner.setData(builder);
+     * Map<String, Object> servers = configResolver.getServers();
+     * if (servers != null) {
+     * builder.servers(servers);
+     * }
+     * aRecorder.store(builder.build(), aConfig);
+     * }
+     */
+    //    @Record(RUNTIME_INIT)
+    //    @BuildStep
+    //    void scanJsonRPCToGenerateAsyncAPI(
+    //            JsonRPCMethodsBuildItem jsonRPCMethodsProvider,
+    //            CombinedIndexBuildItem asyncApiBuildItem,
+    //            JsonRPCAsyncApiRecorder aRecorder,
+    //            JsonRPCConfig jsonRPCConfig,
+    //            RecorderContext recorderContext) {
+    //        System.out.println(jsonRPCMethodsProvider.toString());
+    //        LOGGER.debug(jsonRPCMethodsProvider.toString());
+    //        //TODO: Setup
+    //        //TODO: Annotation Scanner
+    //        AsyncAPI.AsyncAPIBuilder builder = AsyncAPI.builder(); //TODO: Flesh out AsyncAPI config
+    //        //TODO: Add Annotation Scanner Data
+    //        //TODO: Add Servers
+    //        //TODO: Store with Recorder
+    //        aRecorder.storeJsonRPCMethods(builder.build());
+    //    }
 
 }
